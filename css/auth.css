@@ -43,6 +43,7 @@
     padding: 40px;
     width: 100%;
     max-width: 400px;
+    margin-top: -40px;
     transform: translateY(0);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
