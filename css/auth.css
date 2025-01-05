@@ -92,11 +92,11 @@
     transform: translateY(0);
 }
 
-.fgPassword, .adminAccount {
+.fgPassword, .adminAccount, .loginAccount {
     text-decoration: none;
     color: black;
 }
 
-.fgPassword:hover, .adminAccount:hover {
+.fgPassword:hover, .adminAccount:hover, .loginAccount:hover {
     color: blue;
 }
