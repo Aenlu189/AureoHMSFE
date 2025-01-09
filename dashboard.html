@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aureo - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="dashboard-background">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <!-- Username and Date -->
+        <div class="left-elements">
+            <div class="left-display">
+                <div class="overbox">
+                     <span class="user-box">
+                    <i class="fas fa-user user-icon"></i>
+                    Aen
+                </span>
+                    <span class="date-box" id="day"></span>
+                    <span class="date-box" id="full-date"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Label -->
+        <div class="center-elements">
+            <div class="com-label">
+                <h3 onclick="reload()">Aureo Cloud</h3>
+            </div>
+        </div>
+        <!-- Housekeeping page navigation and Log off -->
+        <div class="right-elements">
+            <button class="btn btn-outline-light housekeeping-btn">
+                <i class="fas fa-broom housekeeping-icon"></i>
+                <span class="btn-text">Housekeeping</span>
+            </button>
+            <button class="btn btn-outline-danger logout-btn">
+                <i class="bi bi-power power-icon"></i>
+                <span class="btn-text">Log-off</span>
+            </button>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div id="dashboard-content" class="col content-page active">
+            <!-- Stats -->
+            <div class="stats-container">
+                <div class="stat-card" data-stat="available">
+                    <div class="stat-icon rooms">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Available Rooms</h3>
+                        <p class="stat-value">0/60</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="full-night">
+                    <div class="stat-icon full-night">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Full Night</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="day-caution">
+                    <div class="stat-icon day-caution">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Day Caution</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="session">
+                    <div class="stat-icon session">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Session</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="housekeeping">
+                    <div class="stat-icon housekeeping">
+                        <i class="fas fa-broom"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Housekeeping</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="maintenance">
+                    <div class="stat-icon maintenance">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Maintenance</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" data-stat="revenue">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-money-bill"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Revenue</h3>
+                        <p class="stat-value">0 KS</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Dashboard -->
+            <div class="dashboard-container">
+                <div class="dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-calendar-alt icon-space"></i>Reservations</h4>
+                        <div class="header-actions">
+                            <div class="input-group input-group-sm reservation-input">
+                                <input type="date" class="form-control bg-dark text-white border-dark date-input" id="reservationDateFilter">
+                                <button class="btn btn-outline-secondary" type="button" id="showAllReservationsBtn">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reservationModal">
+                                    <i class="fas fa-plus"></i>
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reservations-list">
+                        <div class="reservation-item">
+                            <div class="reservation-icon full-night">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="reservation-details">
+                                <h5>Sofia Su <p>07552674354</p></h5>
+                                <div class="row">
+                                    <div class="col">
+                                        <p>Check-in : 12/01/2025</p>
+                                        <p>Check-out: 15/01/2025</p>
+                                    </div>
+                                    <div class="col">
+                                        <p>Rooms: 2</p>
+                                        <p>Add-on: extra-bed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="reservation-item" id="reservationsContainer">
+                            <div class="reservation-icon no-reservation">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <div class="reservation-details">
+                                <h5>No Reservations Today <p>New Reservations will appear here</p></h5>
+                                <div class="row">
+                                    <div class="col">
+                                        <p>-</p>
+                                        <p>-</p>
+                                    </div>
+                                    <div class="col">
+                                        <p>-</p>
+                                        <p>-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-shopping-cart icon-space"></i>Check Out</h4>
+                        <div class="header-actions">
+                            <div class="input-group input-group-sm checkout-input">
+                                <input type="date" class="form-control bg-dark text-white border-dark date-input" id="checkoutDateFilter">
+                                <button class="btn btn-outline-secondary" type="button" id="showAllCheckOutBtn">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkout-list">
+                        <div id="checkoutContainer">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+</html>

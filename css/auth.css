@@ -1,3 +1,7 @@
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
 .background {
     background: linear-gradient(135deg, #44000B, #E0455F);
     min-height: 100vh;

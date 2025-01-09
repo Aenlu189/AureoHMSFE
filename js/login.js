@@ -13,6 +13,22 @@ function tpVisibility() {
     }
 }
 
+async function checkSession() {
+    try {
+        const response = await axios.get('http://localhost:8080/check-session', {
+            withCredentials: true
+        });
+
+        if (response.status === 200) {
+            console.log('In session');
+        }
+    } catch(error) {
+        console.log('Not logged in');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkSession)
+
 const loginForm = document.querySelector('.loginForm');
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -21,25 +37,26 @@ loginForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('passwordForm').value;
 
     try {
-        const response = await fetch('http://localhost:8080/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        const response = await axios.post('http://localhost:8080/login', 
+            {username, password},
+            {
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             },
-            body: JSON.stringify({username, password})
-        });
-
-        const data = await response.json();
+        );
 
         if (response.status === 200) {
-            console.log('Login successful:', data);
-            alert('Welcome '+username);
-            window.location.href = "dashboard.html";
-        } else {
-            alert(data.message);
+            sessionStorage.setItem('username', username);
+            window.location.href="dashboard.html";
         }
     } catch (error) {
-        console.error('Error during login: ', error);
-        alert('An error occurred during login. Please try again.');
+        console.error('Login failed', error);
+        if (error.response) {
+            alert(error.response.data.message || 'Login failed');
+        } else {
+            alert('An error occurred during login. Please try again.')
+        }
     }
 });
