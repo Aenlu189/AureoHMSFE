@@ -169,9 +169,9 @@
     background: rgba(0, 253, 0, 0.2);
     color: gold;
 }
-.no-reservation {
-    background: rgba(99, 102, 241, 0.1);
-    color: #6366F1;
+.food{
+    background: rgba(231, 76, 60, 0.2);
+    color: gold
 }
 
 .stat-info h3 {
@@ -212,7 +212,7 @@
     margin-right: 1rem;
 }
 
-.reservation-input, .checkout-input{
+.reservation-input, .checkout-input, .income-input{
     gap: 1rem;
 }
 
@@ -221,18 +221,40 @@
     width: 135px !important;
     font-size: 1.1rem !important;
     padding: 8px 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 .date-input:hover {
-    border-color: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgb(255, 255, 255) !important;
 }
 
 /* Reservations List */
-.reservations-list {
+.reservations-list, .checkout-list, .income-list {
     padding: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
-.reservation-item {
+.reservations-list::-webkit-scrollbar, .checkout-list::-webkit-scrollbar, .income-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.reservations-list::-webkit-scrollbar-track, .checkout-list::-webkit-scrollbar-track, .income-list::-webkit-scrollbar-track {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.reservations-list::-webkit-scrollbar-thumb, .checkout-list::-webkit-scrollbar-thumb, .income-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.reservations-list::-webkit-scrollbar-thumb:hover, .checkout-list::-webkit-scrollbar-thumb:hover, .income-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.reservation-item, .checkout-item, .income-item{
     display: flex;
     align-items: center;
     padding: 1.25rem;
@@ -242,12 +264,12 @@
     transition: 0.3s ease;
 }
 
-.reservation-item:hover {
+.reservation-item:hover, .checkout-item:hover, .income-item:hover {
     background: rgba(255, 255, 255, 0.08);
     transform: translateY(-2px);
 }
 
-.reservation-icon {
+.reservation-icon, .checkout-icon, .income-icon{
     width: 60px;
     height: 60px;
     display: flex;
@@ -258,19 +280,77 @@
     margin: 0 1.5rem 0 1rem;
 }
 
-.reservation-details {
+.reservation-details, .checkout-details, .income-details {
     flex: 1;
 }
 
-.reservation-details h5 {
+.reservation-details h5, .checkout-details h5, .income-details h5 {
     margin: 0 0 0.5rem 0;
 }
 
-.reservation-details p {
+.reservation-details p, .checkout-details p, .income-details p {
     color: rgba(255, 255, 255, 0.6);
     margin: 0;
     font-size: 1rem;
     font-weight: 400;
 }
 
+.no-reservation, .no-checkout, .no-income {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+}
 
+.no-reservation-icon, .no-checkout-icon, .no-income-icon {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px
+}
+
+/* Check out */
+.checkout-room-no {
+    font-size: 2.3rem;
+}
+
+.income {
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 20px;
+    border: 1px solid;
+    border-radius: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: green;
+}
+
+.income-food {
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 20px;
+    border: 1px solid;
+    border-radius: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #005380;
+}
+
+/* Reservation Modal */
+.modal-color {
+    background: #1A1F25 !important;
+    border-radius: 10px !important;
+}
+
+.mcc {
+    background: #2B3441 !important;
+    border-radius: 10px !important;
+}
+
+.modal-title {
+    font-size: 1.6rem !important;
+}
+
+.option {
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.4rem !important;
+    padding-bottom: 0.9rem !important;
+}
