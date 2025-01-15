@@ -281,7 +281,7 @@ function displayReservations(reservations) {
     });
 
     reservationsContainer.innerHTML = activeReservations.map(reservation => `
-        <div class="reservation-item" data-toggle="modal" data-target="#reservationOptionsModal" onclick="setSelectedReservation(${reservation.ID}); createReservationModal();">
+        <div class="reservation-item" data-toggle="modal" data-target="#reservationOptionsModal" onclick="setSelectedReservation(${reservation.ID})">
             <div class="reservation-icon ${reservation.RoomType.toLowerCase()}">
                 <i class="fas ${getRoomType(reservation.RoomType)}"></i>
             </div>
@@ -304,11 +304,549 @@ function displayReservations(reservations) {
 
 let selectedReservationId = null;
 
-function setSelectedReservation(reservationId) {
+async function setSelectedReservation(reservationId) {
     selectedReservationId = reservationId;
-    fetchReservationDetails(reservationId);
+    await fetchReservationDetails(reservationId);
+    updateCheckInButton();
     console.log('Selected reservation: ', reservationId )
 }
+
+async function updateCheckInButton() {
+    const checkInButton = document.getElementById('checkInButton');
+    
+    if (!selectedReservation) {
+        console.error('No reservation selected');
+        return;
+    }
+
+    console.log('Selected room type:', selectedReservation.RoomType);
+
+    checkInButton.onclick = null;
+
+    switch(selectedReservation.RoomType) {
+        case 'FULL-NIGHT':
+            checkInButton.setAttribute('data-target', '#fullNightRModal');
+            checkInButton.onclick = () => {
+                $('#reservationOptionsModal').modal('hide');
+                setTimeout(() => {
+                    fullNightRForm();
+                    $('#fullNightRModal').modal('show');
+                }, 150);
+            };
+            break;
+        case 'DAY-CAUTION':
+            checkInButton.setAttribute('data-target', '#dayCautionRModal');
+            checkInButton.onclick = () => {
+                $('#reservationOptionsModal').modal('hide');
+                setTimeout(() => {
+                    dayCautionRForm();
+                    $('#dayCautionRModal').modal('show');
+                }, 150);
+            };
+            break;
+        case 'SESSION':
+            checkInButton.setAttribute('data-target', '#sessionRModal');
+            checkInButton.onclick = () => {
+                $('#reservationOptionsModal').modal('hide');
+                setTimeout(() => {
+                    sessionRForm();
+                    $('#sessionRModal').modal('show');
+                }, 150);
+            };
+            break;
+        default:
+            console.error('Unknown reservation type:', selectedReservation.RoomType);
+    }
+}
+
+async function fullNightRForm() {
+    $('#reservationOptionsModal').modal('hide');
+
+    const modal = document.getElementById('fullNightRModalLabel');
+    modal.innerHTML = `
+        <i class="fas fa-moon me-2 mt-2 mr-2"></i>
+        Check-in | ${selectedReservation.Name}
+    `;
+
+    const nameInput = document.getElementById('RFNName');
+    const nationalIdInput = document.getElementById('RFNNationalId');
+    const phoneNumberInput = document.getElementById('RFNPhoneNumber');
+    const checkoutInput = document.getElementById('RFNCheckoutDate');
+    const totalAmountDisplay = document.getElementById('dayRTotalAmountDisplay');
+    const amountPaidDisplay = document.getElementById('RAmountPaidDisplay');
+    const roomNumbersContainer = document.getElementById('roomNumbersContainer');
+    const dayCountDisplay = document.getElementById('dayRCountDisplay');
+
+    amountPaidDisplay.textContent = (selectedReservation.AmountPaid || 0).toLocaleString() + ' Ks';
+
+    nameInput.value = selectedReservation.Name;
+    nationalIdInput.value = selectedReservation.NationalID || '';
+    phoneNumberInput.value = selectedReservation.Phone || '';
+
+    const today = formatDate(new Date());
+    checkoutInput.setAttribute("min", today);
+    checkoutInput.value = formatDate(selectedReservation.CheckoutDate);
+
+    roomNumbersContainer.innerHTML = '';
+    for (let i = 0; i < selectedReservation.RoomCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'col-md-12 mb-3';
+        div.innerHTML = `
+            <div class="card mcc border-secondary">
+                <div class="card-body">
+                    <h6 class="card-title mb-3 text-white">Room ${i + 1}</h6>
+                    <div class="mb-2">
+                        <label for="RFNRoomNumber${i}" class="form-label text-white">Room Number</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary room-number-input" 
+                               id="RFNRoomNumber${i}" placeholder="Enter room number" required>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input extra-bed-checkbox" type="checkbox" id="RFNExtraBed${i}">
+                        <label class="form-check-label text-white" for="RFNExtraBed${i}">
+                            Extra Bed (+30,000 Ks)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+        roomNumbersContainer.appendChild(div);
+    }
+
+    function updateDaysAndAmount() {
+        const checkoutDate = new Date(checkoutInput.value);
+        const checkinDate = new Date(today);
+        const diffTime = checkoutDate - checkinDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        dayCountDisplay.textContent = diffDays;
+
+        const baseRoomPrice = 62000;
+        const extraBedPrice = 30000;
+        let totalAmount = 0;
+
+        const extraBedCheckboxes = document.querySelectorAll('.extra-bed-checkbox');
+        extraBedCheckboxes.forEach(checkbox => {
+            let roomPrice = baseRoomPrice;
+            if (checkbox.checked) {
+                roomPrice += extraBedPrice;
+            }
+            totalAmount += roomPrice;
+        });
+
+        totalAmount = (totalAmount * diffDays) - (selectedReservation.AmountPaid || 0);
+        totalAmountDisplay.textContent = totalAmount.toLocaleString() + ' Ks';
+    }
+
+    document.querySelectorAll('.extra-bed-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateDaysAndAmount);
+    });
+
+    checkoutInput.addEventListener('change', updateDaysAndAmount);
+
+    const fullNightForm = document.getElementById('fullNightRForm');
+    fullNightForm.onsubmit = async function(e) {
+        e.preventDefault();
+
+        if (!document.getElementById('RFNPaid').checked) {
+            alert('Please confirm that the full amount is paid.');
+            return;
+        }
+
+        try {
+            const checkoutDate = checkoutInput.value;
+            const roomInputs = document.querySelectorAll('.room-number-input');
+            const extraBedCheckboxes = document.querySelectorAll('.extra-bed-checkbox');
+            const roomConfigs = [];
+
+            for (let i = 0; i < roomInputs.length; i++) {
+                const roomNumber = roomInputs[i].value;
+                if (!roomNumber) {
+                    alert('Please fill in all room numbers');
+                    return;
+                }
+
+                const isRoomAvailable = await statusCheckRoom(roomNumber);
+                if (!isRoomAvailable) {
+                    return;
+                }
+
+                roomConfigs.push({
+                    number: parseInt(roomNumber),
+                    hasExtraBed: extraBedCheckboxes[i].checked
+                });
+            }
+
+            const totalPaid = parseInt(totalAmountDisplay.textContent.replace(/[^0-9]/g, '')) +
+                (selectedReservation.AmountPaid || 0);
+            const amountPerRoom = totalPaid / roomConfigs.length;
+
+            for (const room of roomConfigs) {
+                const formData = {
+                    Name: nameInput.value,
+                    NationalID: nationalIdInput.value || null,
+                    Phone: phoneNumberInput.value || null,
+                    RoomType: 'FULL-NIGHT',
+                    RoomNumber: room.number,
+                    CheckinDate: new Date().toISOString(),
+                    CheckoutDate: new Date(checkoutDate).toISOString(),
+                    ExtraBed: room.hasExtraBed,
+                    PaymentType: document.getElementById('RFNPaymentType').value,
+                    AmountPaid: amountPerRoom,
+                    ExtraCharges: 0,
+                    FoodCharges: 0,
+                    Paid: true
+                };
+
+                console.log('Creating guest record for room:', room.number, formData);
+                const response = await axios.post('http://localhost:8080/create-guest', formData);
+                if (response.status === 200) {
+                    await roomStatusClick(2, room.number);
+                }
+            }
+            await axios.put(`http://localhost:8080/reservations/${selectedReservation.ID}`, {
+                Status: "CHECKED-IN"
+            });
+
+            await loadTodayReservations();
+            await loadRooms();
+            await loadDashboardStats();
+            $('#fullNightRModal').modal('hide');
+            alert('Check-in successful!');
+        } catch (error) {
+            console.error('Error creating guest:', error);
+            alert('Error checking-in the guest. Please try again');
+        }
+    };
+
+    updateDaysAndAmount();
+
+    const fullNightModal = $('#fullNightRModal');
+    const reservationOptionsModal = $('#reservationOptionsModal');
+
+    fullNightModal.on('show.bs.modal', function() {
+        reservationOptionsModal.modal('hide');
+    });
+
+    fullNightModal.on('hidden.bs.modal', function(e) {
+        reservationOptionsModal.modal('hide');
+        fullNightForm.reset();
+        roomNumbersContainer.innerHTML = '';
+    });
+
+    // Handle cancel button click
+    fullNightModal.find('button[data-dismiss="modal"]').on('click', function() {
+        // Set flag to prevent showing reservation options modal
+        const event = $.Event('hidden.bs.modal');
+        event.clickedCancel = true;
+        fullNightModal.trigger(event);
+    });
+}
+
+async function dayCautionRForm() {
+    $('#reservationOptionsModal').modal('hide');
+
+    const modal = document.getElementById('dayCautionRModalLabel');
+    modal.innerHTML = `
+        <i class="fas fa-sun me-2 mt-2 mr-2"></i>
+        Check-in | ${selectedReservation.Name}
+    `;
+
+    const nameInput = document.getElementById('RDCName');
+    const nationalIdInput = document.getElementById('RDCNationalId');
+    const phoneNumberInput = document.getElementById('RDCPhoneNumber');
+    const amountPaidDisplay = document.getElementById('RDCAmountPaidDisplay');
+    const roomNumbersContainer = document.getElementById('roomNumbersDCContainer');
+
+    amountPaidDisplay.textContent = (selectedReservation.AmountPaid || 0).toLocaleString() + ' Ks';
+
+    nameInput.value = selectedReservation.Name;
+    nationalIdInput.value = selectedReservation.NationalID || '';
+    phoneNumberInput.value = selectedReservation.Phone || '';
+
+    roomNumbersContainer.innerHTML = '';
+    for (let i = 0; i < selectedReservation.RoomCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'col-md-12 mb-3';
+        div.innerHTML = `
+            <div class="card mcc border-secondary">
+                <div class="card-body">
+                    <h6 class="card-title mb-3 text-white">Room ${i + 1}</h6>
+                    <div class="mb-2">
+                        <label for="RDCRoomNumber${i}" class="form-label text-white">Room Number</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary room-number-input" 
+                               id="RDCRoomNumber${i}" placeholder="Enter room number" required>
+                    </div>
+                </div>
+            </div>
+        `;
+        roomNumbersContainer.appendChild(div);
+    }
+
+    // Set static values for 12-hour session
+    document.getElementById('cautionDCCountDisplay').textContent = '12';
+    const baseAmount = 40000;
+    const totalAmount = (baseAmount * selectedReservation.RoomCount) - (selectedReservation.AmountPaid || 0);
+    document.getElementById('cautionDCTotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
+
+    const dayCautionForm = document.getElementById('dayCautionRForm');
+    dayCautionForm.onsubmit = async function(e) {
+        e.preventDefault();
+
+        if (!document.getElementById('RDCPaid').checked) {
+            alert('Please confirm that the full amount is paid.');
+            return;
+        }
+
+        try {
+            const roomInputs = document.querySelectorAll('#roomNumbersDCContainer .room-number-input');
+            const roomConfigs = [];
+
+            for (let i = 0; i < roomInputs.length; i++) {
+                const roomNumber = roomInputs[i].value;
+                if (!roomNumber) {
+                    alert('Please fill in all room numbers');
+                    return;
+                }
+
+                const isRoomAvailable = await statusCheckRoom(roomNumber);
+                if (!isRoomAvailable) {
+                    return;
+                }
+
+                roomConfigs.push({
+                    number: parseInt(roomNumber)
+                });
+            }
+
+            const checkinTime = new Date();
+            const checkoutTime = new Date(checkinTime.getTime() + (12 * 60 * 60 * 1000)); // Add 12 hours
+
+            const totalPaid = baseAmount * roomConfigs.length;
+            const amountPerRoom = totalPaid / roomConfigs.length;
+
+            for (const room of roomConfigs) {
+                const formData = {
+                    Name: nameInput.value,
+                    NationalID: nationalIdInput.value || null,
+                    Phone: phoneNumberInput.value || null,
+                    RoomType: 'DAY-CAUTION',
+                    RoomNumber: room.number,
+                    CheckinDate: checkinTime.toISOString(),
+                    CheckoutDate: checkoutTime.toISOString(),
+                    PaymentType: document.getElementById('RDCPaymentType').value,
+                    AmountPaid: amountPerRoom,
+                    ExtraCharges: 0,
+                    FoodCharges: 0,
+                    Paid: true
+                };
+
+                console.log('Creating guest record for room:', room.number, formData);
+                const response = await axios.post('http://localhost:8080/create-guest', formData);
+                if (response.status === 200) {
+                    await roomStatusClick(3, room.number);
+                }
+            }
+
+            await axios.put(`http://localhost:8080/reservations/${selectedReservation.ID}`, {
+                Status: "CHECKED-IN"
+            });
+
+            await loadTodayReservations();
+            await loadRooms();
+            await loadDashboardStats();
+            $('#dayCautionRModal').modal('hide');
+            alert('Check-in successful!');
+        } catch (error) {
+            console.error('Error creating guest:', error);
+            alert('Error checking-in the guest. Please try again');
+        }
+    };
+
+    const dayCautionModal = $('#dayCautionRModal');
+    const reservationOptionsModal = $('#reservationOptionsModal');
+
+    dayCautionModal.on('show.bs.modal', function() {
+        reservationOptionsModal.modal('hide');
+    });
+
+    dayCautionModal.on('hidden.bs.modal', function(e) {
+        reservationOptionsModal.modal('hide');
+        dayCautionForm.reset();
+        roomNumbersContainer.innerHTML = '';
+    });
+}
+
+async function sessionRForm() {
+    $('#reservationOptionsModal').modal('hide');
+
+    const modal = document.getElementById('sessionRModalLabel');
+    modal.innerHTML = `
+        <i class="fas fa-clock me-2 mt-2 mr-2"></i>
+        Check-in | ${selectedReservation.Name}
+    `;
+
+    const nameInput = document.getElementById('RSName');
+    const nationalIdInput = document.getElementById('RSNationalId');
+    const phoneNumberInput = document.getElementById('RSPhoneNumber');
+    const amountPaidDisplay = document.getElementById('RSAmountPaidDisplay');
+    const roomNumbersContainer = document.getElementById('roomNumbersSContainer');
+
+    amountPaidDisplay.textContent = (selectedReservation.AmountPaid || 0).toLocaleString() + ' Ks';
+
+    nameInput.value = selectedReservation.Name;
+    nationalIdInput.value = selectedReservation.NationalID || '';
+    phoneNumberInput.value = selectedReservation.Phone || '';
+
+    roomNumbersContainer.innerHTML = '';
+    for (let i = 0; i < selectedReservation.RoomCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'col-md-12 mb-3';
+        div.innerHTML = `
+            <div class="card mcc border-secondary">
+                <div class="card-body">
+                    <h6 class="card-title mb-3 text-white">Room ${i + 1}</h6>
+                    <div class="mb-2">
+                        <label for="RDCRoomNumber${i}" class="form-label text-white">Room Number</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary room-number-input" 
+                               id="RDCRoomNumber${i}" placeholder="Enter room number" required>
+                    </div>
+                </div>
+            </div>
+        `;
+        roomNumbersContainer.appendChild(div);
+    }
+
+    document.getElementById('SCountDisplay').textContent = '3';
+    const baseAmount = 40000;
+    const totalAmount = (baseAmount * selectedReservation.RoomCount) - (selectedReservation.AmountPaid || 0);
+    document.getElementById('STotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
+
+    const sessionForm = document.getElementById('sessionRForm');
+    sessionForm.onsubmit = async function(e) {
+        e.preventDefault();
+
+        if (!document.getElementById('RSPaid').checked) {
+            alert('Please confirm that the full amount is paid.');
+            return;
+        }
+
+        try {
+            const roomInputs = document.querySelectorAll('#roomNumbersSContainer .room-number-input');
+            const roomConfigs = [];
+
+            for (let i = 0; i < roomInputs.length; i++) {
+                const roomNumber = roomInputs[i].value;
+                if (!roomNumber) {
+                    alert('Please fill in all room numbers');
+                    return;
+                }
+
+                const isRoomAvailable = await statusCheckRoom(roomNumber);
+                if (!isRoomAvailable) {
+                    return;
+                }
+
+                roomConfigs.push({
+                    number: parseInt(roomNumber)
+                });
+            }
+
+            const checkinTime = new Date();
+            const checkoutTime = new Date(checkinTime.getTime() + (3 * 60 * 60 * 1000)); // Add 12 hours
+
+            const totalPaid = baseAmount * roomConfigs.length;
+            const amountPerRoom = totalPaid / roomConfigs.length;
+
+            for (const room of roomConfigs) {
+                const formData = {
+                    Name: nameInput.value,
+                    NationalID: nationalIdInput.value || null,
+                    Phone: phoneNumberInput.value || null,
+                    RoomType: 'SESSION',
+                    RoomNumber: room.number,
+                    CheckinDate: checkinTime.toISOString(),
+                    CheckoutDate: checkoutTime.toISOString(),
+                    PaymentType: document.getElementById('RDCPaymentType').value,
+                    AmountPaid: amountPerRoom,
+                    ExtraCharges: 0,
+                    FoodCharges: 0,
+                    Paid: true
+                };
+
+                console.log('Creating guest record for room:', room.number, formData);
+                const response = await axios.post('http://localhost:8080/create-guest', formData);
+                if (response.status === 200) {
+                    await roomStatusClick(4, room.number);
+                }
+            }
+
+            await axios.put(`http://localhost:8080/reservations/${selectedReservation.ID}`, {
+                Status: "CHECKED-IN"
+            });
+
+            await loadTodayReservations();
+            await loadRooms();
+            await loadDashboardStats();
+            $('#sessionRModal').modal('hide');
+            alert('Check-in successful!');
+        } catch (error) {
+            console.error('Error creating guest:', error);
+            alert('Error checking-in the guest. Please try again');
+        }
+    };
+
+    const sessionModal = $('#sessionRModal');
+    const reservationOptionsModal = $('#reservationOptionsModal');
+
+    sessionModal.on('show.bs.modal', function() {
+        reservationOptionsModal.modal('hide');
+    });
+
+    sessionModal.on('hidden.bs.modal', function(e) {
+        reservationOptionsModal.modal('hide');
+        sessionForm.reset();
+        roomNumbersContainer.innerHTML = '';
+    });
+}
+
+async function getRoom(Room) {
+    try {
+        const response = await axios.get(`http://localhost:8080/rooms/${Room}`);
+        console.log('Room data:', response.data);
+        if (!response.data) {
+            throw new Error('Room not found');
+        }
+        return response.data;
+    } catch (error) {
+        console.error(`Error getting ${Room} status:`, error);
+        throw error;
+    }
+}
+
+async function statusCheckRoom(roomNumber) {
+    try {
+        const room = await getRoom(roomNumber);
+        console.log('Checking room status:', room.Status);
+
+        if (!room) {
+            alert("Room not found");
+            return false;
+        }
+
+        if ([2,3,4].includes(room.Status)) {
+            alert(`Room ${roomNumber} is occupied`);
+            return false;
+        } else if (room.Status === 5) {
+            alert(`Room ${roomNumber} is under housekeeping`);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error checking room status:', error);
+        alert(`Error checking status for room ${roomNumber}`);
+        return false;
+    }
+}
+
 
 async function deleteReservation() {
     if (!selectedReservationId) {
@@ -440,210 +978,5 @@ async function saveReservation() {
     } catch(error) {
         console.error('Error updating reservation: ', error);
         alert('Failed to update reservation. Please try again.');
-    }
-}
-
-async function fullNightRForm() {
-    $('#reservationOptionsModal').modal('hide');
-
-    const modal = document.getElementById('fullNightRModalLabel');
-    modal.innerHTML = `
-        <i class="fas fa-moon me-2 mt-2 mr-2"></i>
-        Check-in | ${selectedReservation.Name}
-    `;
-
-    const nameInput = document.getElementById('RFNName');
-    const nationalIdInput = document.getElementById('RFNNationalId');
-    const phoneNumberInput = document.getElementById('RFNPhoneNumber');
-    const checkoutInput = document.getElementById('RFNCheckoutDate');
-    const totalAmountDisplay = document.getElementById('dayRTotalAmountDisplay');
-    const amountPaidDisplay = document.getElementById('RAmountPaidDisplay');
-    const roomNumbersContainer = document.getElementById('roomNumbersContainer');
-    const dayCountDisplay = document.getElementById('dayRCountDisplay');
-
-    amountPaidDisplay.textContent = (selectedReservation.AmountPaid || 0).toLocaleString() + ' Ks';
-
-    nameInput.value = selectedReservation.Name;
-    nationalIdInput.value = selectedReservation.NationalID || '';
-    phoneNumberInput.value = selectedReservation.Phone || '';
-
-    const today = formatDate(new Date());
-    checkoutInput.setAttribute("min", today);
-    checkoutInput.value = formatDate(selectedReservation.CheckoutDate);
-
-    roomNumbersContainer.innerHTML = '';
-    for (let i = 0; i < selectedReservation.RoomCount; i++) {
-        const div = document.createElement('div');
-        div.className = 'col-md-12 mb-3';
-        div.innerHTML = `
-            <div class="card mcc border-secondary">
-                <div class="card-body">
-                    <h6 class="card-title mb-3 text-white">Room ${i + 1}</h6>
-                    <div class="mb-2">
-                        <label for="RFNRoomNumber${i}" class="form-label text-white">Room Number</label>
-                        <input type="text" class="form-control bg-dark text-light border-secondary room-number-input" 
-                               id="RFNRoomNumber${i}" placeholder="Enter room number" required>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input extra-bed-checkbox" type="checkbox" id="RFNExtraBed${i}">
-                        <label class="form-check-label text-white" for="RFNExtraBed${i}">
-                            Extra Bed (+30,000 Ks)
-                        </label>
-                    </div>
-                </div>
-            </div>
-        `;
-        roomNumbersContainer.appendChild(div);
-    }
-
-    function updateDaysAndAmount() {
-        const checkoutDate = new Date(checkoutInput.value);
-        const checkinDate = new Date(today);
-        const diffTime = checkoutDate - checkinDate;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        dayCountDisplay.textContent = diffDays;
-
-        const baseRoomPrice = 62000;
-        const extraBedPrice = 30000;
-        let totalAmount = 0;
-
-        const extraBedCheckboxes = document.querySelectorAll('.extra-bed-checkbox');
-        extraBedCheckboxes.forEach(checkbox => {
-            let roomPrice = baseRoomPrice;
-            if (checkbox.checked) {
-                roomPrice += extraBedPrice;
-            }
-            totalAmount += roomPrice;
-        });
-
-        totalAmount = (totalAmount * diffDays) - (selectedReservation.AmountPaid || 0);
-        totalAmountDisplay.textContent = totalAmount.toLocaleString() + ' Ks';
-    }
-
-    document.querySelectorAll('.extra-bed-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateDaysAndAmount);
-    });
-
-    checkoutInput.addEventListener('change', updateDaysAndAmount);
-
-    const fullNightForm = document.getElementById('fullNightRForm');
-    fullNightForm.onsubmit = async function(e) {
-        e.preventDefault();
-
-        if (!document.getElementById('RFNPaid').checked) {
-            alert('Please confirm that the full amount is paid.');
-            return;
-        }
-
-        try {
-            const checkoutDate = checkoutInput.value;
-            const roomInputs = document.querySelectorAll('.room-number-input');
-            const extraBedCheckboxes = document.querySelectorAll('.extra-bed-checkbox');
-            const roomConfigs = [];
-
-            for (let i = 0; i < roomInputs.length; i++) {
-                const roomNumber = roomInputs[i].value;
-                if (!roomNumber) {
-                    alert('Please fill in all room numbers');
-                    return;
-                }
-
-                const isRoomAvailable = await statusCheckRoom(roomNumber);
-                if (!isRoomAvailable) {
-                    return;
-                }
-
-                roomConfigs.push({
-                    number: parseInt(roomNumber),
-                    hasExtraBed: extraBedCheckboxes[i].checked
-                });
-            }
-
-            const totalPaid = parseInt(totalAmountDisplay.textContent.replace(/[^0-9]/g, '')) + 
-                            (selectedReservation.AmountPaid || 0);
-            const amountPerRoom = totalPaid / roomConfigs.length;
-
-            for (const room of roomConfigs) {
-                const formData = {
-                    Name: nameInput.value,
-                    NationalID: nationalIdInput.value || null,
-                    Phone: phoneNumberInput.value || null,
-                    RoomType: 'FULL-NIGHT',
-                    RoomNumber: room.number,
-                    CheckinDate: new Date().toISOString(),
-                    CheckoutDate: new Date(checkoutDate).toISOString(),
-                    ExtraBed: room.hasExtraBed,
-                    PaymentType: document.getElementById('RFNPaymentType').value,
-                    AmountPaid: amountPerRoom,
-                    ExtraCharges: 0,
-                    FoodCharges: 0,
-                    Paid: true
-                };
-
-                console.log('Creating guest record for room:', room.number, formData);
-                const response = await axios.post('http://localhost:8080/create-guest', formData);
-                if (response.status === 200) {
-                    await roomStatusClick(2, room.number);
-                }
-            }
-            await axios.put(`http://localhost:8080/reservations/${selectedReservation.ID}`, {
-                Status: "CHECKED-IN"
-            });
-
-            await loadTodayReservations();
-            await loadRooms();
-            await loadDashboardStats();
-            $('#fullNightRModal').modal('hide');
-            alert('Check-in successful!');
-        } catch (error) {
-            console.error('Error creating guest:', error);
-            alert('Error checking-in the guest. Please try again');
-        }
-    };
-
-    updateDaysAndAmount();
-
-    $('#fullNightRModal').on('hidden.bs.modal', function() {
-        fullNightForm.reset();
-        roomNumbersContainer.innerHTML = '';
-    });
-}
-
-async function getRoom(Room) {
-    try {
-        const response = await axios.get(`http://localhost:8080/rooms/${Room}`);
-        console.log('Room data:', response.data);
-        if (!response.data) {
-            throw new Error('Room not found');
-        }
-        return response.data;
-    } catch (error) {
-        console.error(`Error getting ${Room} status:`, error);
-        throw error;
-    }
-}
-
-async function statusCheckRoom(roomNumber) {
-    try {
-        const room = await getRoom(roomNumber);
-        console.log('Checking room status:', room.Status);
-
-        if (!room) {
-            alert("Room not found");
-            return false;
-        }
-
-        if ([2,3,4].includes(room.Status)) {
-            alert(`Room ${roomNumber} is occupied`);
-            return false;
-        } else if (room.Status === 5) {
-            alert(`Room ${roomNumber} is under housekeeping`);
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error('Error checking room status:', error);
-        alert(`Error checking status for room ${roomNumber}`);
-        return false;
     }
 }
