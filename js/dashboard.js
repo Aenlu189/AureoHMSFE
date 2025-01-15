@@ -107,4 +107,6 @@ async function logout() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', initialiseDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    initialiseDashboard();
+})
