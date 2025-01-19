@@ -1,3 +1,14 @@
+let selectedReservationId = null;
+let selectedReservation = null;
+
+
+async function setSelectedReservation(reservationId) {
+    selectedReservationId = reservationId;
+    await fetchReservationDetails(reservationId);
+    updateCheckInButton();
+    console.log('Selected reservation: ', reservationId )
+}
+
 function getRoomType(roomType) {
     switch(roomType) {
         case 'FULL-NIGHT':
@@ -9,65 +20,6 @@ function getRoomType(roomType) {
         default:
             return 'fas fa-bed';
     }
-}
-
-function formatRoomType(type) {
-    const types = {
-        'FULL-NIGHT': 'Full Night',
-        'DAY-CAUTION': 'Day Caution',
-        'SESSION': 'Session'
-    };
-    return types[type] || type;
-}
-
-function formatPaymentType(type) {
-    const types = {
-        'NONE': 'None',
-        'KPAY': 'KPay',
-        'AYAPAY': 'AyaPay',
-        'WAVEPAY': 'WavePay',
-        'CASH': 'Cash'
-    };
-    return types[type] || type;
-}
-
-function formatDate(date) {
-    const d = new Date(date);
-
-    const year = d.getFullYear();
-    let month = d.getMonth() + 1;
-    let day = d.getDate();
-
-    if (month < 10) {
-        month = "0" + month;
-    }
-
-    if (day < 10) {
-        day = "0" + day;
-    }
-
-    return year + "-" + month + "-" + day;
-}
-
-function getTimeAgo(date) {
-    const seconds = Math.floor((new Date() - date)/1000);
-
-    let interval = Math.floor(seconds / 31536000);
-    if (interval > 1) return interval + ' years ago';
-
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) return interval + ' months ago';
-
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) return interval + ' days ago';
-
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) return interval + ' hours ago';
-
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) return interval + ' minutes ago';
-
-    return Math.floor(seconds) + ' seconds ago';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -224,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// To find reservations on other dates
 async function loadReservationsByDate(date) {
     try {
         console.log('Loading reservations for date:', date);
@@ -239,6 +192,7 @@ async function loadReservationsByDate(date) {
     }
 }
 
+// To find reservations today
 async function loadTodayReservations() {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -256,6 +210,7 @@ async function loadTodayReservations() {
     }
 }
 
+// Displaying the reservation cards for the selected date
 function displayReservations(reservations) {
     const reservationsContainer = document.getElementById('reservationsContainer');
     const activeReservations = reservations.filter(reservation => reservation.Status !== 'CHECKED-IN');
@@ -300,15 +255,6 @@ function displayReservations(reservations) {
             </div>
         </div>
     `).join('');
-}
-
-let selectedReservationId = null;
-
-async function setSelectedReservation(reservationId) {
-    selectedReservationId = reservationId;
-    await fetchReservationDetails(reservationId);
-    updateCheckInButton();
-    console.log('Selected reservation: ', reservationId )
 }
 
 async function updateCheckInButton() {
@@ -359,6 +305,7 @@ async function updateCheckInButton() {
     }
 }
 
+// Status Reservation Forms
 async function fullNightRForm() {
     $('#reservationOptionsModal').modal('hide');
 
@@ -810,6 +757,7 @@ async function sessionRForm() {
     });
 }
 
+// Status check room utility class to get the room from the database
 async function getRoom(Room) {
     try {
         const response = await axios.get(`http://localhost:8080/rooms/${Room}`);
@@ -849,7 +797,7 @@ async function statusCheckRoom(roomNumber) {
     }
 }
 
-
+// Delete Reservation
 async function deleteReservation() {
     if (!selectedReservationId) {
         alert('No reservation selected');
@@ -874,8 +822,7 @@ async function deleteReservation() {
     }
 }
 
-let selectedReservation = null;
-
+// View and Edit the reservation details
 async function fetchReservationDetails(reservationId) {
     try {
         const response = await axios.get(`http://localhost:8080/reservations/${reservationId}`);
@@ -981,4 +928,43 @@ async function saveReservation() {
         console.error('Error updating reservation: ', error);
         alert('Failed to update reservation. Please try again.');
     }
+}
+
+// Format
+function formatRoomType(type) {
+    const types = {
+        'FULL-NIGHT': 'Full Night',
+        'DAY-CAUTION': 'Day Caution',
+        'SESSION': 'Session'
+    };
+    return types[type] || type;
+}
+
+function formatPaymentType(type) {
+    const types = {
+        'NONE': 'None',
+        'KPAY': 'KPay',
+        'AYAPAY': 'AyaPay',
+        'WAVEPAY': 'WavePay',
+        'CASH': 'Cash'
+    };
+    return types[type] || type;
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+
+    const year = d.getFullYear();
+    let month = d.getMonth() + 1;
+    let day = d.getDate();
+
+    if (month < 10) {
+        month = "0" + month;
+    }
+
+    if (day < 10) {
+        day = "0" + day;
+    }
+
+    return year + "-" + month + "-" + day;
 }

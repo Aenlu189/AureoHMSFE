@@ -541,9 +541,15 @@ body {
 }
 
 .heightRoomNumbersContainer{
-    height: 590px;
+    height: 400px;
     overflow-y: auto;
 }
+
+.heightFoodOrderDetails {
+    height: 510px;
+    overflow-y: auto;
+}
+
 
 .occupiedOptionsGDetails{
     background: rgb(22, 118, 175) !important;

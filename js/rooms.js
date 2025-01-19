@@ -1,8 +1,9 @@
+let selectedRoom = null;
+const selectedItems = new Map();
+
 document.addEventListener('DOMContentLoaded', () => {
     loadRooms();
 });
-
-let selectedRoom = null;
 
 async function loadRooms() {
     try {
@@ -90,6 +91,7 @@ function createRoomCard(room) {
     return card;
 }
 
+// For room cards class names
 function getStatusClass(status) {
     const statusClasses = {
         1: 'available',
@@ -102,6 +104,7 @@ function getStatusClass(status) {
     return statusClasses[status] || 'available';
 }
 
+// For room cards information
 function getStatusInfo(status) {
     const statusInfo = {
         1: {
@@ -138,6 +141,7 @@ function getStatusInfo(status) {
     return statusInfo[status] || statusInfo[1];
 }
 
+// Guest Room Check-in Forms
 async function fullNightForm() {
     if (!selectedRoom) {
         console.error('No room selected');
@@ -383,6 +387,7 @@ async function sessionForm() {
     });
 }
 
+// Option of room according to the status Functions
 async function optionStatus(status) {
     if (!selectedRoom) {
         console.error('No room selected');
@@ -399,6 +404,7 @@ async function optionStatus(status) {
     }
 }
 
+// Get the status of the room being pressed
 async function roomStatusClick(status, roomNumber) {
     try {
         const response = await axios.put(`http://localhost:8080/rooms/${roomNumber}`, {status});
@@ -410,6 +416,7 @@ async function roomStatusClick(status, roomNumber) {
     }
 }
 
+// Occupied Status 2 3 4 Options
 async function occupiedOptions(option) {
     $('#occupiedOptionsModal').modal('hide');
 
@@ -422,6 +429,10 @@ async function occupiedOptions(option) {
     }
 }
 
+async function checkoutGuest(roomNumber) {
+
+}
+// Guest Details
 async function showGuestDetails(roomNumber) {
     const modalLabel = document.getElementById('guestDetailsModalLabel');
     modalLabel.innerHTML = `
@@ -429,7 +440,7 @@ async function showGuestDetails(roomNumber) {
         ${selectedRoom} Guest Details
     `;
     try {
-        // Get the active guest for this room
+        // Get active guest
         const guestResponse = await axios.get(`http://localhost:8080/guests/current/${roomNumber}`);
         const guest = guestResponse.data;
 
@@ -445,7 +456,6 @@ async function showGuestDetails(roomNumber) {
         document.getElementById('guestNationalID').textContent = guest.NationalID || 'N/A';
         document.getElementById('guestPhone').textContent = guest.Phone || 'N/A';
         document.getElementById('guestRoomType').textContent = formatRoomType(guest.RoomType) || 'N/A';
-        document.getElementById('guestRoomNumber').textContent = guest.RoomNumber || 'N/A';
         document.getElementById('guestCheckin').textContent = guest.CheckinDate ? new Date(guest.CheckinDate).toLocaleString() : 'N/A';
         document.getElementById('guestCheckout').textContent = guest.CheckoutDate ? new Date(guest.CheckoutDate).toLocaleString() : 'N/A';
 
@@ -482,15 +492,13 @@ async function showGuestDetails(roomNumber) {
             foodOrderHistory.innerHTML = '<div class="text-center text-muted">No food orders found</div>';
         }
 
+        // Payment Information
         document.getElementById('roomCharges').textContent = (guest.AmountPaid - guest.ExtraCharges - guest.FoodCharges).toLocaleString() + ' Ks';
         document.getElementById('extraCharges').textContent = (guest.ExtraCharges || 0).toLocaleString() + ' Ks';
         document.getElementById('foodChargesDetails').textContent = guest.FoodCharges.toLocaleString() + ' Ks';
         document.getElementById('gAmountPaid').textContent = (guest.AmountPaid || 0).toLocaleString() + ' Ks';
         document.getElementById('paymentType').textContent = formatPaymentType(guest.PaymentType) || 'N/A';
         document.getElementById('paymentStatus').textContent = guest.Paid ? 'Paid' : 'Pending';
-
-        const totalAmount = calculateTotalAmount(guest);
-        document.getElementById('gAmountDue').textContent = totalAmount.toLocaleString() + ' Ks';
 
         $('#guestDetailsModal').modal('show');
     } catch (error) {
@@ -499,222 +507,7 @@ async function showGuestDetails(roomNumber) {
     }
 }
 
-async function updateGuestFoodPrice(guestId, roomNumber) {
-    try {
-        if (!guestId) {
-            console.error('Guest ID is missing');
-            return;
-        }
-
-        // Get current guest to ensure they are active
-        const guestResponse = await axios.get(`http://localhost:8080/guests/current/${roomNumber}`);
-        const currentGuest = guestResponse.data;
-        
-        if (!currentGuest || currentGuest.Status !== 'ACTIVE') {
-            console.error('Guest is not active');
-            return;
-        }
-
-        const foodOrdersResponse = await axios.get(`http://localhost:8080/food/orders/${roomNumber}`);
-        const foodOrders = foodOrdersResponse.data;
-        console.log('All food orders:', foodOrders);
-        
-        const guestOrders = foodOrders.filter(order => order.GuestID === parseInt(guestId));
-        console.log('Guest orders:', guestOrders);
-        console.log('Guest ID being checked:', guestId);
-        
-        const totalFoodPrice = guestOrders.reduce((total, order) => {
-            console.log('Current order:', order);
-            console.log('Current total:', total);
-            console.log('Order price:', order.Price);
-            return total + order.Price;
-        }, 0);
-        console.log('Final total food price:', totalFoodPrice);
-        
-        const response = await axios.put(`http://localhost:8080/guests/foodPrice/${guestId}`, {
-            FoodCharges: totalFoodPrice,
-        });
-
-        if (response.data && response.data.guest) {
-            return response.data.guest.FoodCharges;
-        }
-        return totalFoodPrice;
-    } catch (error) {
-        console.error('Error updating guest food price:', error);
-        throw error;
-    }
-}
-
-document.getElementById('foodOrderForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    if (selectedItems.size === 0) {
-        alert('Please select at least one item');
-        return;
-    }
-
-    try {
-        const guestResponse = await axios.get(`http://localhost:8080/guests/current/${selectedRoom}`);
-        const guest = guestResponse.data;
-
-        if (!guest || guest.Status !== 'ACTIVE') {
-            throw new Error('No active guest found in this room');
-        }
-
-        if (!guest.ID) {
-            throw new Error('Invalid guest ID');
-        }
-
-        for (const [foodName, item] of selectedItems) {
-            const orderData = {
-                GuestID: guest.ID,
-                RoomID: parseInt(selectedRoom),
-                FoodName: foodName,
-                Quantity: item.quantity,
-                Price: item.price * item.quantity,
-                OrderTime: new Date().toISOString(),
-            };
-
-            const response = await axios.post('http://localhost:8080/food/order', orderData);
-            if (!response.data) {
-                throw new Error('Failed to create food order');
-            }
-        }
-
-        await updateGuestFoodPrice(guest.ID, selectedRoom);
-        console.log('Updated food price for guest:', guest.ID);
-
-        alert('Food order placed successfully!');
-        $('#foodOrderModal').modal('hide');
-
-        selectedItems.clear();
-        updateSelectedItemsList();
-
-        if ($('#guestDetailsModal').is(':visible')) {
-            showGuestDetails(selectedRoom);
-        }
-    } catch (error) {
-        console.error('Error placing food order:', error);
-        alert(error.message || 'Failed to place food order');
-    }
-});
-
-async function foodOrder(roomNumber) {
-    const modalLabel = document.getElementById('foodOrderModalLabel');
-    modalLabel.innerHTML = `
-        <i class="fas fa-burger me-2 mt-2 mr-2"></i>
-        ${selectedRoom} Food Order
-    `;
-    try {
-        const response = await axios.get(`http://localhost:8080/guests/current/${roomNumber}`);
-        const guest = response.data;
-
-        if (!guest || guest.Status !== 'ACTIVE') {
-            alert('No active guest found in this room');
-            return;
-        }
-
-        loadMenuItems();
-        $('#foodOrderModal').modal('show');
-    } catch (error) {
-        console.error('Error loading guest details:', error);
-        alert('Failed to load guest details');
-    }
-}
-
-async function loadMenuItems() {
-    try {
-        const response = await axios.get('http://localhost:8080/food/menus');
-        const menuItems = response.data;
-
-        const menuItemsList = document.getElementById('menuItemsList');
-        menuItemsList.innerHTML = '';
-
-        menuItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center';
-            itemElement.innerHTML = `
-                <div>
-                    <h6 class="mb-0">${item.FoodName}</h6>
-                    <small class="text-primary">${parseInt(item.FoodPrice).toLocaleString()} Ks</small>
-                </div>
-                </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="event.preventDefault(); addMenuItem('${item.FoodName}', ${item.FoodPrice})">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            `;
-
-            menuItemsList.appendChild(itemElement);
-        });
-    } catch (error) {
-        console.error('Error loading menu items:', error);
-        alert('Failed to load menu items');
-    }
-}
-
-const selectedItems = new Map();
-
-function addMenuItem(foodName, price) {
-    const currentQuantity = selectedItems.get(foodName)?.quantity || 0;
-    selectedItems.set(foodName, {
-        quantity: currentQuantity + 1,
-        price: price
-    });
-    updateSelectedItemsList();
-}
-
-function removeMenuItem(foodName) {
-    const item = selectedItems.get(foodName);
-    if (item && item.quantity > 1) {
-        selectedItems.set(foodName, {
-            quantity: item.quantity - 1,
-            price: item.price
-        });
-    } else {
-        selectedItems.delete(foodName);
-    }
-    updateSelectedItemsList();
-}
-
-function updateSelectedItemsList() {
-    const selectedItemsList = document.getElementById('selectedItems');
-    const totalAmountElement = document.getElementById('totalAmountFood');
-    const noItemsMessage = document.getElementById('noItemsMessage');
-
-    selectedItemsList.innerHTML = '';
-    let totalAmount = 0;
-
-    if (selectedItems.size === 0) {
-        selectedItemsList.innerHTML = `
-            <div id="noItemsMessage" class="text-center text-muted py-4">
-                No items selected
-            </div>
-        `;
-    } else {
-        selectedItems.forEach((item, foodName) => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center';
-            itemElement.innerHTML = `
-                <div>
-                    <h6 class="mb-0">${foodName}</h6>
-                    <small class="text-primary">${(item.price * item.quantity).toLocaleString()} Ks</small>
-                </div>
-                <div class="d-flex align-items-center">
-                    <span class="badge bg-primary mr-2">${item.quantity}x</span>
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="event.preventDefault(); removeMenuItem('${foodName}')">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            `;
-            selectedItemsList.appendChild(itemElement);
-            totalAmount += item.price * item.quantity;
-        });
-    }
-    
-    totalAmountElement.textContent = `${totalAmount.toLocaleString()} Ks`;
-}
-
+// Extend Stay
 async function extendStay(roomNumber) {
     const modalLabel = document.getElementById('extendStayModalLabel');
     modalLabel.innerHTML = `
@@ -929,7 +722,7 @@ async function extendStay(roomNumber) {
                 </div>
                 <div class="form-check">
                     <input class="form-check-input extra-bed-checkbox" type="checkbox" id="ESExtraBed">
-                    <label for="ESExtraBed" class="form-check-label text-white ml-5 width">Extra Bed (+30,000 Ks)</label>
+                    <label for="ESExtraBed" class="form-check-label text-white ml-2 width">Extra Bed (+30,000 Ks)</label>
                 </div>
             </div>
             `;
@@ -1046,14 +839,223 @@ function calculateRoomCharges(guest) {
     return rate + extraBedCharge;
 }
 
-function calculateTotalAmount(guest) {
-    const extraCharges = guest.ExtraCharges || 0;
-    const foodCharges = guest.FoodCharges || 0;
-    const amountPaid = guest.AmountPaid || 0;
+// Food Order
+async function updateGuestFoodPrice(guestId, roomNumber) {
+    try {
+        if (!guestId) {
+            console.error('Guest ID is missing');
+            return;
+        }
 
-    return (extraCharges + foodCharges + amountPaid) - amountPaid;
+        // Get current guest to ensure they are active
+        const guestResponse = await axios.get(`http://localhost:8080/guests/current/${roomNumber}`);
+        const currentGuest = guestResponse.data;
+        
+        if (!currentGuest || currentGuest.Status !== 'ACTIVE') {
+            console.error('Guest is not active');
+            return;
+        }
+
+        const foodOrdersResponse = await axios.get(`http://localhost:8080/food/orders/${roomNumber}`);
+        const foodOrders = foodOrdersResponse.data;
+        console.log('All food orders:', foodOrders);
+        
+        const guestOrders = foodOrders.filter(order => order.GuestID === parseInt(guestId));
+        console.log('Guest orders:', guestOrders);
+        console.log('Guest ID being checked:', guestId);
+        
+        const totalFoodPrice = guestOrders.reduce((total, order) => {
+            console.log('Current order:', order);
+            console.log('Current total:', total);
+            console.log('Order price:', order.Price);
+            return total + order.Price;
+        }, 0);
+        console.log('Final total food price:', totalFoodPrice);
+        
+        const response = await axios.put(`http://localhost:8080/guests/foodPrice/${guestId}`, {
+            FoodCharges: totalFoodPrice,
+            AmountPaid: currentGuest.AmountPaid + totalFoodPrice,
+        });
+
+        if (response.data) {
+            return currentGuest.FoodCharges;
+        }
+        return totalFoodPrice;
+    } catch (error) {
+        console.error('Error updating guest food price:', error);
+        throw error;
+    }
 }
 
+document.getElementById('foodOrderForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    if (selectedItems.size === 0) {
+        alert('Please select at least one item');
+        return;
+    }
+
+    try {
+        const guestResponse = await axios.get(`http://localhost:8080/guests/current/${selectedRoom}`);
+        const guest = guestResponse.data;
+
+        if (!guest || guest.Status !== 'ACTIVE') {
+            throw new Error('No active guest found in this room');
+        }
+
+        if (!guest.ID) {
+            throw new Error('Invalid guest ID');
+        }
+
+        for (const [foodName, item] of selectedItems) {
+            const orderData = {
+                GuestID: guest.ID,
+                RoomID: parseInt(selectedRoom),
+                FoodName: foodName,
+                Quantity: item.quantity,
+                Price: item.price * item.quantity,
+                OrderTime: new Date().toISOString(),
+            };
+
+            const response = await axios.post('http://localhost:8080/food/order', orderData);
+            if (!response.data) {
+                throw new Error('Failed to create food order');
+            }
+        }
+
+        await updateGuestFoodPrice(guest.ID, selectedRoom);
+        console.log('Updated food price for guest:', guest.ID);
+
+        alert('Food order placed successfully!');
+        $('#foodOrderModal').modal('hide');
+
+        selectedItems.clear();
+        updateSelectedItemsList();
+
+        if ($('#guestDetailsModal').is(':visible')) {
+            showGuestDetails(selectedRoom);
+        }
+    } catch (error) {
+        console.error('Error placing food order:', error);
+        alert(error.message || 'Failed to place food order');
+    }
+});
+
+async function foodOrder(roomNumber) {
+    const modalLabel = document.getElementById('foodOrderModalLabel');
+    modalLabel.innerHTML = `
+        <i class="fas fa-burger me-2 mt-2 mr-2"></i>
+        ${selectedRoom} Food Order
+    `;
+    try {
+        const response = await axios.get(`http://localhost:8080/guests/current/${roomNumber}`);
+        const guest = response.data;
+
+        if (!guest || guest.Status !== 'ACTIVE') {
+            alert('No active guest found in this room');
+            return;
+        }
+
+        loadMenuItems();
+        $('#foodOrderModal').modal('show');
+    } catch (error) {
+        console.error('Error loading guest details:', error);
+        alert('Failed to load guest details');
+    }
+}
+
+async function loadMenuItems() {
+    try {
+        const response = await axios.get('http://localhost:8080/food/menus');
+        const menuItems = response.data;
+
+        const menuItemsList = document.getElementById('menuItemsList');
+        menuItemsList.innerHTML = '';
+
+        menuItems.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center';
+            itemElement.innerHTML = `
+                <div>
+                    <h6 class="mb-0">${item.FoodName}</h6>
+                    <small class="text-primary">${parseInt(item.FoodPrice).toLocaleString()} Ks</small>
+                </div>
+                </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="event.preventDefault(); addMenuItem('${item.FoodName}', ${item.FoodPrice})">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            `;
+
+            menuItemsList.appendChild(itemElement);
+        });
+    } catch (error) {
+        console.error('Error loading menu items:', error);
+        alert('Failed to load menu items');
+    }
+}
+
+function addMenuItem(foodName, price) {
+    const currentQuantity = selectedItems.get(foodName)?.quantity || 0;
+    selectedItems.set(foodName, {
+        quantity: currentQuantity + 1,
+        price: price
+    });
+    updateSelectedItemsList();
+}
+
+function removeMenuItem(foodName) {
+    const item = selectedItems.get(foodName);
+    if (item && item.quantity > 1) {
+        selectedItems.set(foodName, {
+            quantity: item.quantity - 1,
+            price: item.price
+        });
+    } else {
+        selectedItems.delete(foodName);
+    }
+    updateSelectedItemsList();
+}
+
+function updateSelectedItemsList() {
+    const selectedItemsList = document.getElementById('selectedItems');
+    const totalAmountElement = document.getElementById('totalAmountFood');
+    const noItemsMessage = document.getElementById('noItemsMessage');
+
+    selectedItemsList.innerHTML = '';
+    let totalAmount = 0;
+
+    if (selectedItems.size === 0) {
+        selectedItemsList.innerHTML = `
+            <div id="noItemsMessage" class="text-center text-muted py-4">
+                No items selected
+            </div>
+        `;
+    } else {
+        selectedItems.forEach((item, foodName) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center';
+            itemElement.innerHTML = `
+                <div>
+                    <h6 class="mb-0">${foodName}</h6>
+                    <small class="text-primary">${(item.price * item.quantity).toLocaleString()} Ks</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-primary mr-2">${item.quantity}x</span>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="event.preventDefault(); removeMenuItem('${foodName}')">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            selectedItemsList.appendChild(itemElement);
+            totalAmount += item.price * item.quantity;
+        });
+    }
+    
+    totalAmountElement.textContent = `${totalAmount.toLocaleString()} Ks`;
+}
+
+// Formating
 function formatDate(date) {
     const dateObj = date instanceof Date ? date : new Date(date);
 
