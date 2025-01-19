@@ -371,8 +371,9 @@ async function fullNightRForm() {
     const nameInput = document.getElementById('RFNName');
     const nationalIdInput = document.getElementById('RFNNationalId');
     const phoneNumberInput = document.getElementById('RFNPhoneNumber');
-    const checkoutInput = document.getElementById('RFNCheckoutDate');
-    const totalAmountDisplay = document.getElementById('dayRTotalAmountDisplay');
+    const checkoutRInput = document.getElementById('RFNCheckoutDate');
+    const totalAmountDisplay = document.getElementById('RTotalAmountDisplay');
+    const roomsCountDisplay = document.getElementById('roomsCountFNRDisplay');
     const amountPaidDisplay = document.getElementById('RAmountPaidDisplay');
     const roomNumbersContainer = document.getElementById('roomNumbersContainer');
     const dayCountDisplay = document.getElementById('dayRCountDisplay');
@@ -384,8 +385,8 @@ async function fullNightRForm() {
     phoneNumberInput.value = selectedReservation.Phone || '';
 
     const today = formatDate(new Date());
-    checkoutInput.setAttribute("min", today);
-    checkoutInput.value = formatDate(selectedReservation.CheckoutDate);
+    checkoutRInput.setAttribute("min", today);
+    checkoutRInput.value = formatDate(selectedReservation.CheckoutDate);
 
     roomNumbersContainer.innerHTML = '';
     for (let i = 0; i < selectedReservation.RoomCount; i++) {
@@ -413,11 +414,13 @@ async function fullNightRForm() {
     }
 
     function updateDaysAndAmount() {
-        const checkoutDate = new Date(checkoutInput.value);
+        const checkoutDate = new Date(checkoutRInput.value);
         const checkinDate = new Date(today);
         const diffTime = checkoutDate - checkinDate;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        dayCountDisplay.textContent = diffDays;
+        console.log(diffDays.toLocaleString())
+        dayCountDisplay.textContent = diffDays.toLocaleString();
+        roomsCountDisplay.textContent = selectedReservation.RoomCount;
 
         const baseRoomPrice = 62000;
         const extraBedPrice = 30000;
@@ -440,7 +443,7 @@ async function fullNightRForm() {
         checkbox.addEventListener('change', updateDaysAndAmount);
     });
 
-    checkoutInput.addEventListener('change', updateDaysAndAmount);
+    checkoutRInput.addEventListener('change', updateDaysAndAmount);
 
     const fullNightForm = document.getElementById('fullNightRForm');
     fullNightForm.onsubmit = async function(e) {
@@ -452,7 +455,7 @@ async function fullNightRForm() {
         }
 
         try {
-            const checkoutDate = checkoutInput.value;
+            const checkoutDate = checkoutRInput.value;
             const roomInputs = document.querySelectorAll('.room-number-input');
             const extraBedCheckboxes = document.querySelectorAll('.extra-bed-checkbox');
             const roomConfigs = [];
@@ -581,11 +584,10 @@ async function dayCautionRForm() {
         roomNumbersContainer.appendChild(div);
     }
 
-    // Set static values for 12-hour session
-    document.getElementById('cautionDCCountDisplay').textContent = '12';
+    document.getElementById('roomsCountDCRDisplay').textContent = selectedReservation.RoomCount;
     const baseAmount = 40000;
     const totalAmount = (baseAmount * selectedReservation.RoomCount) - (selectedReservation.AmountPaid || 0);
-    document.getElementById('cautionDCTotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
+    document.getElementById('RDCTotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
 
     const dayCautionForm = document.getElementById('dayCautionRForm');
     dayCautionForm.onsubmit = async function(e) {
@@ -715,10 +717,10 @@ async function sessionRForm() {
         roomNumbersContainer.appendChild(div);
     }
 
-    document.getElementById('SCountDisplay').textContent = '3';
+    document.getElementById('roomsCountSRDisplay').textContent = selectedReservation.RoomCount;
     const baseAmount = 40000;
     const totalAmount = (baseAmount * selectedReservation.RoomCount) - (selectedReservation.AmountPaid || 0);
-    document.getElementById('STotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
+    document.getElementById('RSTotalAmountDisplay').textContent = totalAmount.toLocaleString() + ' Ks';
 
     const sessionForm = document.getElementById('sessionRForm');
     sessionForm.onsubmit = async function(e) {
@@ -885,7 +887,7 @@ async function fetchReservationDetails(reservationId) {
     }
 }
 
-async function showGuestDetails() {
+async function showReservationDetails() {
     if (!selectedReservationId) {
         alert('No reservation selected');
         return;

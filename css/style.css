@@ -541,6 +541,44 @@ body {
 }
 
 .heightRoomNumbersContainer{
-    height: 380px;
+    height: 590px;
+    overflow-y: auto;
+}
+
+.occupiedOptionsGDetails{
+    background: rgb(22, 118, 175) !important;
+}
+
+.occupiedOptionsEStay{
+    background: rgb(210, 103, 30) !important;
+}
+
+.occupiedOptionsFOrder{
+    background: rgb(137, 22, 175) !important;
+}
+
+.occupiedOptionsEPayment{
+    background: rgb(63, 131, 40) !important;
+}
+
+.occupiedOptionsCheckout{
+    background: rgb(199, 35, 60) !important;
+}
+
+.occupiedOptionsGDetails:hover, .occupiedOptionsEStay:hover, .occupiedOptionsFOrder:hover, .occupiedOptionsEPayment:hover, .occupiedOptionsCheckout:hover  {
+    background: white !important;
+}
+
+.priceColor {
+    color: rgba(255, 255, 255, 0.53) !important;
+}
+
+.menuCards {
+    height: 600px;
+    overflow-y: auto;
+}
+
+.selectedItems, .availableItems {
+    height: 490px;
     overflow-y: auto;
 }

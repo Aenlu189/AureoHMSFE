@@ -6,7 +6,7 @@
     <title>Aureo - Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
@@ -454,7 +454,7 @@
                             </button>
                         </div>
                         <div class="card mcc border-secondary mb-3">
-                            <button type="button" class="col-md-12 btn option btn-success btn-outline-light" onclick="showGuestDetails()">
+                            <button type="button" class="col-md-12 btn option btn-success btn-outline-light" onclick="showReservationDetails()">
                                 <h4><i class="bi bi-paperclip mr-2"></i>Details</h4>
                             </button>
                         </div>
@@ -469,134 +469,9 @@
         </div>
     </div>
 
-    <!-- Reservation Details Modal -->
+    <!-- Reservation Details Modal js-->
     <div class="modal fade" id="reservationDetailsModal" tabindex="-1" aria-labelledby="reservationDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-color text-light border-secondary">
-                <div class="modal-header bg-dark border-secondary">
-                    <h5 class="modal-title" id="reservationDetailsModalLabel">
-                        <i class="fas fa-user me-2 mt-2 mr-2"></i>
-                        Reservation Details
-                    </h5>
-                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times me-2"></i>
-                    </button>
-                </div>
-                <div class="modal-body mb-2 mt-2">
-                    <form id="reservationDetailsForm">
-                        <!-- Guest Information -->
-                        <div class="card mcc border-secondary mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6 mb-2">
-                                        <span>Name<p class="detailOutput bg-dark mt-2 view-mode" id="reservationName">-</p>
-                                            <input type="text" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRName">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-6 mb-2">
-                                        <span>National ID <p class="detailOutput bg-dark mt-2 view-mode" id="reservationNID">-</p>
-                                            <input type="text" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRNID">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <span>Phone <p class="detailOutput bg-dark mt-2 view-mode" id="reservationPhone">-</p>
-                                            <input type="text" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRPhone">
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mcc border-secondary mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3 text-white">Reservation Details</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-4 mb-2">
-                                        <span>Room Type<p class="detailOutput bg-dark mt-2 view-mode" id="reservationRoomType">-</p>
-                                            <select class="form-select bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRRoomType">
-                                                <option value="FULL-NIGHT">Full Night</option>
-                                                <option value="DAY-CAUTION">Day Caution</option>
-                                                <option value="SESSION">Session</option>
-                                            </select>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Check-in Date<p class="detailOutput bg-dark mt-2 view-mode" id="reservationCheckinDate">-</p>
-                                            <input type="date" class="form-control bg-dark text-light border-secondary date-input mt-2 mb-3 edit-mode d-none" id="editRCheckin" min="">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Check-out Date<p class="detailOutput bg-dark mt-2 view-mode" id="reservationCheckoutDate">-</p>
-                                            <input type="date" class="form-control bg-dark text-light border-secondary date-input mt-2 mb-3 edit-mode d-none" id="editRCheckout" min="">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Number of Guests<p class="detailOutput bg-dark mt-2 view-mode" id="reservationGuestCount">-</p>
-                                            <input type="number" class="form-control bg-dark text-light border-secondary mt-2 mb-2 edit-mode d-none" id="editRGuestCount">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Number of Rooms<p class="detailOutput bg-dark mt-2 view-mode" id="reservationRoomCount">-</p>
-                                            <input type="number" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRRoomCount">
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Add-On<p class="detailOutput bg-dark mt-2 view-mode" id="reservationExtraBed">None</p>
-                                            <div class="card bg-dark border-secondary pt-1 br-12 mt-2 mb-3 edit-mode d-none">
-                                                <input type="checkbox" class="form-check-input ml-2 h-50 w-50" id="editRExtraBed">
-                                                <label for="extraBed" class="form-label text-white ml-5 width">extra bed</label>
-                                            </div>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-12 mb-2">
-                                        <span>Notes<p class="detailOutput bg-dark mt-2 view-mode" id="reservationNotes">-</p>
-                                            <textarea type="date" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRNotes" rows="1"></textarea>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mcc border-secondary mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-4 mb-2">
-                                        <span>Payment Type<p class="detailOutput bg-dark mt-2 view-mode" id="reservationPaymentType">-</p>
-                                            <select class="form-select bg-dark text-light border-secondary mt-2 mb-2 edit-mode d-none" id="editRPaymentType" required>
-                                                <option value="NONE">None</option>
-                                                <option value="KPAY">KPay</option>
-                                                <option value="AYAPAY">AyaPay</option>
-                                                <option value="WAVEPAY">WavePay</option>
-                                                <option value="CASH">Cash</option>
-                                            </select>
-                                        </span>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <span>Amount Paid<p class="detailOutput bg-dark mt-2 view-mode" id="reservationAmountPaid">0 ks</p>
-                                            <input type="number" class="form-control bg-dark text-light border-secondary mt-2 mb-3 edit-mode d-none" id="editRAmountPaid">
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-secondary bg-dark">
-                    <button type="button" class="btn btn-outline-light view-mode" onclick="toggleEditMode(true)">
-                        Edit
-                    </button>
-                    <button type="button" class="btn btn-outline-light edit-mode d-none" onclick="toggleEditMode(false)">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary view-mode" data-dismiss="modal">
-                        OK
-                    </button>
-                    <button type="submit" class="btn btn-primary edit-mode d-none" onclick="saveReservation()">
-                        Save
-                    </button>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Room Options Modal -->
@@ -649,96 +524,8 @@
         </div>
     </div>
 
-    <!-- Full Night Modal -->
-    <div class="modal fade" id="fullNightModal" tabindex="-1" aria-labelledby="fullNightModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-md">
-            <div class="modal-content modal-color text-light border-secondary">
-                <div class="modal-header bg-dark border-secondary">
-                    <h5 class="modal-title" id="fullNightModalLabel">
-                        <i class="fas fa-calendar-alt me-2 mt-2 mr-2"></i>
-                        Check-in
-                    </h5>
-                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times me-2"></i>
-                    </button>
-                </div>
-                <div class="modal-body mb-2 mt-2">
-                    <form id="fullNightForm">
-                        <!-- Guest Information -->
-                        <div class="card mcc border-secondary mb-3">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-white">Price :</span>
-                                    <span id="dayRoomPrice" class="fw-bold text-light">62,000 Ks</span>
-                                </div>
-                                <div class="d-flex justify-content-between roomCount">
-                                    <span class="text-white" id="dayCount">Days :</span>
-                                    <span id="dayCountDisplay" class="fw-bold text-primary">1</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="text-white" id="totalAmount">Total :</h5>
-                                    <h5 id="dayTotalAmountDisplay" class="fw-bold text-primary">62,000 Ks</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mcc border-secondary mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-12 mb-2">
-                                        <label for="FNName" class="form-label text-white">Name</label>
-                                        <input type="text" class="form-control bg-dark text-light border-secondary" id="FNName" required>
-                                    </div>
-                                    <div class="col-md-12 mb-2">
-                                        <label for="FNNationalId" class="form-label text-white">National ID</label>
-                                        <input type="text" class="form-control bg-dark text-light border-secondary" id="FNNationalId">
-                                    </div>
-                                    <div class="col-md-12 mb-2">
-                                        <label for="FNPhoneNumber" class="form-label text-white">Phone Number</label>
-                                        <input type="text" class="form-control bg-dark text-light border-secondary" id="FNPhoneNumber" required>
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <label for="FNCheckoutDate" class="form-label text-white">Check-out</label>
-                                        <input type="date" class="form-control bg-dark text-light border-secondary date-input" id="FNCheckoutDate" min="" required>
-                                    </div>
-                                    <div class="col-md-8 mb-3">
-                                        <label class="form-label text-white mr-2">Add-On</label>
-                                        <div class="card bg-dark border-secondary pt-1 br-12">
-                                            <input type="checkbox" class="form-check-input ml-2 h-50 w-50 pt-1" id="FNExtraBed" name="paid" value="yes">
-                                            <label for="FNExtraBed" class="form-label text-white ml-5 height">Extra Bed (+30,000 Ks)</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mcc border-secondary">
-                            <div class="card-body">
-                                <div class="col-md-12 mb-2">
-                                    <label class="form-label text-white mr-2">Payment Type: </label>
-                                    <select class="form-select bg-dark text-light border-secondary form-payment" name="paymentType" id="FNPaymentType" required>
-                                        <option value="KPAY">KPay</option>
-                                        <option value="AYAPAY">AyaPay</option>
-                                        <option value="WAVEPAY">WavePay</option>
-                                        <option value="CASH">Cash</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="card bg-dark border-secondary pt-1 br-12">
-                                        <input type="checkbox" class="form-check-input ml-2 h-50 w-50" id="FNPaid" name="paid" value="yes">
-                                        <label for="FNPaid" class="form-label text-white ml-5 width">I confirm the full amount is paid.</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-secondary bg-dark">
-                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-outline-primary" form="fullNightForm">Check In</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Full Night Modal js-->
+    <div class="modal fade" id="fullNightModal" tabindex="-1" aria-labelledby="fullNightModalLabel" aria-hidden="true"></div>
 
     <!-- Day Caution Modal -->
     <div class="modal fade" id="dayCautionModal" tabindex="-1" aria-labelledby="dayCautionModalLabel" aria-hidden="true">
@@ -796,10 +583,10 @@
                                 <div class="col-md-12 mb-2">
                                     <label class="form-label text-white mr-2">Payment Type: </label>
                                     <select class="form-select bg-dark text-light border-secondary form-payment" name="paymentType" id="DCPaymentType" required>
+                                        <option value="CASH">Cash</option>
                                         <option value="KPAY">KPay</option>
                                         <option value="AYAPAY">AyaPay</option>
                                         <option value="WAVEPAY">WavePay</option>
-                                        <option value="CASH">Cash</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12">
@@ -876,10 +663,10 @@
                                 <div class="col-md-12 mb-2">
                                     <label class="form-label text-white mr-2">Payment Type: </label>
                                     <select class="form-select bg-dark text-light border-secondary form-payment" name="paymentType" id="SPaymentType" required>
+                                        <option value="CASH">Cash</option>
                                         <option value="KPAY">KPay</option>
                                         <option value="AYAPAY">AyaPay</option>
                                         <option value="WAVEPAY">WavePay</option>
-                                        <option value="CASH">Cash</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12">
@@ -902,7 +689,7 @@
 
     <!-- Full Night Reservation Modal -->
     <div class="modal fade" id="fullNightRModal" tabindex="-1" aria-labelledby="fullNightRModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content modal-color text-light border-secondary">
                 <div class="modal-header bg-dark border-secondary">
                     <h5 class="modal-title" id="fullNightRModalLabel">
@@ -916,83 +703,89 @@
                 <div class="modal-body mb-2 mt-2">
                     <form id="fullNightRForm">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-7">
-                                <!-- Guest Information -->
-                                <div class="card mcc border-secondary mb-3">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
+                            <!-- Left Column - Guest Information -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Guest Information</h6>
+                                        <div class="flex-grow-1">
+                                            <div class="mb-3">
                                                 <label for="RFNName" class="form-label text-white">Name</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RFNName" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RFNPhoneNumber" class="form-label text-white">Phone Number</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RFNPhoneNumber" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RFNNationalId" class="form-label text-white">National ID</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RFNNationalId" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label for = "RFNCheckoutDate" class="form-label text-white">Check-out</label>
-                                                <input type="date" class="form-control form-control bg-dark text-light border-secondary" id="RFNCheckoutDate" required>
+                                            <div class="mb-3">
+                                                <label for="RFNCheckoutDate" class="form-label text-white">Check-out</label>
+                                                <input type="date" class="form-control bg-dark text-light border-secondary" id="RFNCheckoutDate" required>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Room Assignment -->
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-0 text-white mb-3">Room Assignment</h6>
-                                        <div id="roomNumbersContainer" class="heightRoomNumbersContainer">
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Right Column -->
-                            <div class="col-md-5">
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Payment Summary</h6>
-                                        <!-- Price Breakdown -->
-                                        <div class="bg-dark p-3 rounded mb-3 border border-secondary">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <small class="text-white">Base Room Price:</small>
-                                                <span class="text-light">62,000 Ks</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <small class="text-white">Days:</small>
-                                                <span id="dayRCountDisplay" class="text-primary">1</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <small class="text-white">Amount Paid:</small>
-                                                <span id="RAmountPaidDisplay" class="text-primary">0 Ks</span>
-                                            </div>
-                                            <hr class="border-secondary my-2">
-                                            <div class="d-flex justify-content-between">
-                                                <span class="text-white">Total Due:</span>
-                                                <span id="dayRTotalAmountDisplay" class="text-primary fw-bold">0 Ks</span>
-                                            </div>
+                            <!-- Middle Column - Room Assignment -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Room Assignment</h6>
+                                        <div id="roomNumbersContainer" class="heightRoomNumbersContainer flex-grow-1">
                                         </div>
-                                        <!-- Payment Type -->
-                                        <div class="mb-3">
-                                            <label class="form-label text-white">Payment Method</label>
-                                            <select class="form-select bg-dark text-light border-secondary" id="RFNPaymentType" required>
-                                                <option value="KPAY">KPay</option>
-                                                <option value="AYAPAY">AyaPay</option>
-                                                <option value="WAVEPAY">WavePay</option>
-                                                <option value="CASH">Cash</option>
-                                            </select>
-                                        </div>
-                                        <!-- Payment Confirmation -->
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="RFNPaid" required>
-                                            <label class="form-check-label text-white" for="RFNPaid">
-                                                I confirm the full amount is paid
-                                            </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Column - Payment Summary -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Payment Summary</h6>
+                                        <div class="flex-grow-1">
+                                            <!-- Price Breakdown -->
+                                            <div class="bg-dark p-3 rounded mb-4 border border-secondary">
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Base Room Price:</small>
+                                                    <span class="text-light">62,000 Ks</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Days:</small>
+                                                    <span id="dayRCountDisplay" class="text-primary">1</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Rooms:</small>
+                                                    <span id="roomsCountFNRDisplay" class="text-primary">1</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Amount Paid:</small>
+                                                    <span id="RAmountPaidDisplay" class="text-primary">0 Ks</span>
+                                                </div>
+                                                <hr class="border-secondary my-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="text-white fw-bold">Total Due:</span>
+                                                    <span id="RTotalAmountDisplay" class="text-primary fw-bold">0 Ks</span>
+                                                </div>
+                                            </div>
+                                            <!-- Payment Type -->
+                                            <div class="mb-4">
+                                                <label class="form-label text-white">Payment Method</label>
+                                                <select class="form-select bg-dark text-light border-secondary" id="RFNPaymentType" required>
+                                                    <option value="CASH">Cash</option>
+                                                    <option value="KPAY">KPay</option>
+                                                    <option value="AYAPAY">AyaPay</option>
+                                                    <option value="WAVEPAY">WavePay</option>
+                                                </select>
+                                            </div>
+                                            <!-- Payment Confirmation -->
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="RFNPaid" required>
+                                                <label class="form-check-label text-white" for="RFNPaid">
+                                                    I confirm the full amount is paid
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1010,7 +803,7 @@
 
     <!-- Day Caution Reservation Modal -->
     <div class="modal fade" id="dayCautionRModal" tabindex="-1" aria-labelledby="fullNightRModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content modal-color text-light border-secondary">
                 <div class="modal-header bg-dark border-secondary">
                     <h5 class="modal-title" id="dayCautionRModalLabel">
@@ -1024,78 +817,85 @@
                 <div class="modal-body mb-2 mt-2">
                     <form id="dayCautionRForm">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-7">
-                                <!-- Guest Information -->
-                                <div class="card mcc border-secondary mb-3">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
+                            <!-- Left Column - Guest Information -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Guest Information</h6>
+                                        <div class="flex-grow-1">
+                                            <div class="mb-3">
                                                 <label for="RDCName" class="form-label text-white">Name</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RDCName" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RDCPhoneNumber" class="form-label text-white">Phone Number</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RDCPhoneNumber" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RDCNationalId" class="form-label text-white">National ID</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RDCNationalId" readonly>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Room Assignment -->
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-0 text-white mb-3">Room Assignment</h6>
-                                        <div id="roomNumbersDCContainer" class="heightRoomNumbersContainer">
-
+                            </div>
+                            <!-- Middle Column - Room Assignment -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Room Assignment</h6>
+                                        <div id="roomNumbersDCContainer" class="heightRoomNumbersContainer flex-grow-1">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Right Column -->
-                            <div class="col-md-5">
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Payment Summary</h6>
-                                        <!-- Price Breakdown -->
-                                        <div class="bg-dark p-3 rounded mb-3 border border-secondary">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-white">Price :</span>
-                                                <span id="cautionDCRoomPrice" class="fw-bold text-light">40,000 Ks</span>
+                            <!-- Right Column - Payment Summary -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Payment Summary</h6>
+                                        <div class="flex-grow-1">
+                                            <!-- Price Breakdown -->
+                                            <div class="bg-dark p-3 rounded mb-4 border border-secondary">
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Base Room Price:</small>
+                                                    <span class="text-light">40,000 Ks</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Hours:</small>
+                                                    <span id="RDCCountDisplay" class="text-primary">12</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Rooms:</small>
+                                                    <span id="roomsCountDCRDisplay" class="text-primary">1</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Amount Paid:</small>
+                                                    <span id="RDCAmountPaidDisplay" class="text-primary">0 Ks</span>
+                                                </div>
+                                                <hr class="border-secondary my-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="text-white fw-bold">Total Due:</span>
+                                                    <span id="RDCTotalAmountDisplay" class="text-primary fw-bold">0 Ks</span>
+                                                </div>
                                             </div>
-                                            <div class="d-flex justify-content-between roomCount">
-                                                <span class="text-white" id="cautionDCCount">Hours: </span>
-                                                <span id="cautionDCCountDisplay" class="fw-bold text-primary">12</span>
+                                            <!-- Payment Type -->
+                                            <div class="mb-4">
+                                                <label class="form-label text-white">Payment Method</label>
+                                                <select class="form-select bg-dark text-light border-secondary" id="RDCPaymentType" required>
+                                                    <option value="CASH">Cash</option>
+                                                    <option value="KPAY">KPay</option>
+                                                    <option value="AYAPAY">AyaPay</option>
+                                                    <option value="WAVEPAY">WavePay</option>
+                                                </select>
                                             </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <small class="text-white">Amount Paid:</small>
-                                                <span id="RDCAmountPaidDisplay" class="text-primary">0 Ks</span>
+                                            <!-- Payment Confirmation -->
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="RDCPaid" required>
+                                                <label class="form-check-label text-white" for="RDCPaid">
+                                                    I confirm the full amount is paid
+                                                </label>
                                             </div>
-                                            <div class="d-flex justify-content-between">
-                                                <h5 class="text-white" id="cautionDCTotalAmount">Total Due:</h5>
-                                                <h5 id="cautionDCTotalAmountDisplay" class="fw-bold text-primary">40,000 Ks</h5>
-                                            </div>
-                                        </div>
-                                        <!-- Payment Type -->
-                                        <div class="mb-3">
-                                            <label class="form-label text-white">Payment Method</label>
-                                            <select class="form-select bg-dark text-light border-secondary" id="RDCPaymentType" required>
-                                                <option value="KPAY">KPay</option>
-                                                <option value="AYAPAY">AyaPay</option>
-                                                <option value="WAVEPAY">WavePay</option>
-                                                <option value="CASH">Cash</option>
-                                            </select>
-                                        </div>
-                                        <!-- Payment Confirmation -->
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="RDCPaid" required>
-                                            <label class="form-check-label text-white" for="RDCPaid">
-                                                I confirm the full amount is paid
-                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -1113,11 +913,11 @@
 
     <!-- Session Reservation Modal -->
     <div class="modal fade" id="sessionRModal" tabindex="-1" aria-labelledby="sessionRModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content modal-color text-light border-secondary">
                 <div class="modal-header bg-dark border-secondary">
                     <h5 class="modal-title" id="sessionRModalLabel">
-                        <i class="fas fa-sun me-2 mt-2 mr-2"></i>
+                        <i class="fas fa-clock me-2 mt-2 mr-2"></i>
                         Check-in
                     </h5>
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
@@ -1127,78 +927,81 @@
                 <div class="modal-body mb-2 mt-2">
                     <form id="sessionRForm">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-7">
-                                <!-- Guest Information -->
-                                <div class="card mcc border-secondary mb-3">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Guest Information</h6>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
+                            <!-- Left Column - Guest Information -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Guest Information</h6>
+                                        <div class="flex-grow-1">
+                                            <div class="mb-3">
                                                 <label for="RSName" class="form-label text-white">Name</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RSName" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RSPhoneNumber" class="form-label text-white">Phone Number</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RSPhoneNumber" readonly>
                                             </div>
-                                            <div class="col-md-6 mb-2">
+                                            <div class="mb-3">
                                                 <label for="RSNationalId" class="form-label text-white">National ID</label>
                                                 <input type="text" class="form-control bg-dark text-light border-secondary" id="RSNationalId" readonly>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Room Assignment -->
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-0 text-white mb-3">Room Assignment</h6>
-                                        <div id="roomNumbersSContainer" class="heightRoomNumbersContainer">
-
+                            </div>
+                            <!-- Middle Column - Room Assignment -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Room Assignment</h6>
+                                        <div id="roomNumbersSContainer" class="heightRoomNumbersContainer flex-grow-1">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Right Column -->
-                            <div class="col-md-5">
-                                <div class="card mcc border-secondary">
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-3 text-white">Payment Summary</h6>
-                                        <!-- Price Breakdown -->
-                                        <div class="bg-dark p-3 rounded mb-3 border border-secondary">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-white">Price :</span>
-                                                <span id="SRoomPrice" class="fw-bold text-light">40,000 Ks</span>
+                            <!-- Right Column - Payment Summary -->
+                            <div class="col-md-4">
+                                <div class="card mcc border-secondary h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title mb-4 text-white">Payment Summary</h6>
+                                        <div class="flex-grow-1">
+                                            <!-- Price Breakdown -->
+                                            <div class="bg-dark p-3 rounded mb-4 border border-secondary">
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Base Room Price:</small>
+                                                    <span class="text-light">40,000 Ks</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Rooms:</small>
+                                                    <span id="roomsCountSRDisplay" class="text-primary">1</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-3">
+                                                    <small class="text-white">Amount Paid:</small>
+                                                    <span id="RSAmountPaidDisplay" class="text-primary">0 Ks</span>
+                                                </div>
+                                                <hr class="border-secondary my-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="text-white fw-bold">Total Due:</span>
+                                                    <span id="RSTotalAmountDisplay" class="text-primary fw-bold">0 Ks</span>
+                                                </div>
                                             </div>
-                                            <div class="d-flex justify-content-between roomCount">
-                                                <span class="text-white" id="cautionSCount">Hours: </span>
-                                                <span id="SCountDisplay" class="fw-bold text-primary">12</span>
+                                            <!-- Payment Type -->
+                                            <div class="mb-4">
+                                                <label class="form-label text-white">Payment Method</label>
+                                                <select class="form-select bg-dark text-light border-secondary" id="RSPaymentType" required>
+                                                    <option value="CASH">Cash</option>
+                                                    <option value="KPAY">KPay</option>
+                                                    <option value="AYAPAY">AyaPay</option>
+                                                    <option value="WAVEPAY">WavePay</option>
+                                                </select>
                                             </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <small class="text-white">Amount Paid:</small>
-                                                <span id="RSAmountPaidDisplay" class="text-primary">0 Ks</span>
+                                            <!-- Payment Confirmation -->
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="RSPaid" required>
+                                                <label class="form-check-label text-white" for="RSPaid">
+                                                    I confirm the full amount is paid
+                                                </label>
                                             </div>
-                                            <div class="d-flex justify-content-between">
-                                                <h5 class="text-white" id="cautionSTotalAmount">Total Due:</h5>
-                                                <h5 id="STotalAmountDisplay" class="fw-bold text-primary">40,000 Ks</h5>
-                                            </div>
-                                        </div>
-                                        <!-- Payment Type -->
-                                        <div class="mb-3">
-                                            <label class="form-label text-white">Payment Method</label>
-                                            <select class="form-select bg-dark text-light border-secondary" id="RSPaymentType" required>
-                                                <option value="KPAY">KPay</option>
-                                                <option value="AYAPAY">AyaPay</option>
-                                                <option value="WAVEPAY">WavePay</option>
-                                                <option value="CASH">Cash</option>
-                                            </select>
-                                        </div>
-                                        <!-- Payment Confirmation -->
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="RSPaid" required>
-                                            <label class="form-check-label text-white" for="RDCPaid">
-                                                I confirm the full amount is paid
-                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -1214,8 +1017,286 @@
         </div>
     </div>
 
-    <!-- Room Options -->
+    <!-- Occupied Options Modal -->
+    <div class="modal fade" id="occupiedOptionsModal" tabindex="-1" aria-labelledby="occupiedOptionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content modal-color text-light border-secondary">
+                <!-- Header -->
+                <div class="modal-header bg-dark border-secondary">
+                    <h5 class="modal-title" id="occupiedOptionsModalLabel">
+                        <i class="fas fa-calendar-alt me-2 mt-2 mr-2"></i>
+                        Options
+                    </h5>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times me-2"></i>
+                    </button>
+                </div>
+                <div class="modal-body mb-2 mt-2">
+                    <form id="occupiedOptionsForm">
+                        <!-- Options -->
+                        <div class="card mcc border-secondary mb-3">
+                            <button type="button" class="col-md-12 btn option occupiedOptionsGDetails btn-outline-light" onclick="occupiedOptions(1)">
+                                <h4><i class="fas fa-user mr-2"></i>Guest Details</h4>
+                            </button>
+                        </div>
+                        <div class="card mcc border-secondary mb-3">
+                            <button type="button" class="col-md-12 btn option occupiedOptionsEStay btn-outline-light" onclick="occupiedOptions(2)">
+                                <h4><i class="fas fa-bed mr-2"></i>Extend Stay</h4>
+                            </button>
+                        </div>
+                        <div class="card mcc border-secondary mb-3">
+                            <button type="button" class="col-md-12 btn option occupiedOptionsFOrder btn-outline-light" onclick="occupiedOptions(3)">
+                                <h4><i class="fas fa-burger mr-2"></i>Food Order</h4>
+                            </button>
+                        </div>
+                        <div class="card mcc border-secondary mb-3">
+                            <button type="button" class="col-md-12 btn option occupiedOptionsEPayment btn-outline-light" onclick="optionStatus(5)">
+                                <h4><i class="fas fa-money-bill mr-2"></i>Extra Payment</h4>
+                            </button>
+                        </div>
+                        <div class="card mcc border-secondary mb-3">
+                            <button type="button" class="col-md-12 btn option occupiedOptionsCheckout btn-outline-light" onclick="optionStatus(6)">
+                                <h4><i class="fas fa-x mr-2"></i>Check-out</h4>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Guest Details Modal -->
+    <div class="modal fade" id="guestDetailsModal" tabindex="-1" aria-labelledby="guestDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content modal-color text-light border-secondary">
+                <!-- Header -->
+                <div class="modal-header bg-dark border-secondary">
+                    <h5 class="modal-title" id="guestDetailsModalLabel">
+                        <i class="fas fa-user me-2 mt-2 mr-2"></i>
+                        Guest Details
+                    </h5>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times me-2"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row card-container">
+                        <!-- Guest Information Card -->
+                        <div class="col-md-4">
+                            <div class="card mcc border-secondary mb-3">
+                                <div class="card-header bg-dark border-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Guest Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="text-light">Name:</label>
+                                        <div id="guestName" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">National ID:</label>
+                                        <div id="guestNationalID" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Phone:</label>
+                                        <div id="guestPhone" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Room Type:</label>
+                                        <div id="guestRoomType" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Room Number:</label>
+                                        <div id="guestRoomNumber" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Check-in:</label>
+                                        <div id="guestCheckin" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Check-out:</label>
+                                        <div id="guestCheckout" class="detailOutput"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Food Order History Card -->
+                        <div class="col-md-4">
+                            <div class="card mcc border-secondary mb-3">
+                                <div class="card-header bg-dark border-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-utensils mr-2"></i>Food Order History</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="foodOrderHistory" class="heightRoomNumbersContainer">
+
+                                    </div>
+                                    <!-- <div class="mt-3">
+                                        <label class="text-light">Total Food Charges:</label>
+                                        <div id="totalFoodCharges" class="detailOutput"></div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Payment Summary Card -->
+                        <div class="col-md-4">
+                            <div class="card mcc border-secondary mb-3">
+                                <div class="card-header bg-dark border-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-money-bill mr-2"></i>Payment Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="text-light">Room Charges:</label>
+                                        <div id="roomCharges" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Extra Charges:</label>
+                                        <div id="extraCharges" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Food Charges:</label>
+                                        <div id="foodChargesDetails" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Payment Type:</label>
+                                        <div id="paymentType" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Payment Status:</label>
+                                        <div id="paymentStatus" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Amount Paid:</label>
+                                        <div id="gAmountPaid" class="detailOutput"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-light">Amount due:</label>
+                                        <div id="gAmountDue" class="detailOutput text-primary fw-bold"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend Stay Modal -->
+    <div class="modal fade" id="extendStayModal" tabindex="-1" aria-labelledby="extendStayModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content modal-color text-light border-secondary">
+                <div class="modal-header bg-dark border-secondary">
+                    <h5 class="modal-title" id="extendStayModalLabel">
+                        <i class="fas fa-calendar-alt me-2 mt-2 mr-2"></i>
+                        Check-in
+                    </h5>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times me-2"></i>
+                    </button>
+                </div>
+                <div class="modal-body mb-2 mt-2">
+                    <form id="extendStayForm">
+                        <!-- Guest Information -->
+                        <div class="card mcc border-secondary mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3 text-white">Guest Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6 mb-2">
+                                        <span>Name<p class="detailOutput bg-dark mt-2" id="ESName">-</p></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span>Room Type <p class="detailOutput bg-dark mt-2 view-mode" id="ESRoomType">-</p></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mcc border-secondary mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3 text-white">Stay Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6 mb-2">
+                                        <span>Check-In<p class="detailOutput bg-dark mt-2" id="ESCheckinDate">-</p></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span>Check-Out<p class="detailOutput bg-dark mt-2 view-mode" id="ESCheckoutDate">-</p></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span>Total Amount Paid<p class="detailOutput bg-dark mt-2 view-mode" id="ESTotalAmountPaid">-</p></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mcc border-secondary mb-3" id="stayDependentCard1">
+
+                        </div>
+                        <div class="card mcc border-secondary" id="stayDependentCard2">
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary bg-dark">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-outline-primary" form="extendStayForm">Check In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Order Modal -->
+    <div class="modal fade" id="foodOrderModal" tabindex="-1" aria-labelledby="foodOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content modal-color text-light border-secondary">
+                <div class="modal-header bg-dark border-secondary">
+                    <h5 class="modal-title" id="foodOrderModalLabel">
+                        <i class="fas fa-utensils me-2 mt-2 mr-2"></i>
+                        Order Food
+                    </h5>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times me-2"></i>
+                    </button>
+                </div>
+                <div class="modal-body mb-2 mt-2">
+                    <form id="foodOrderForm">
+                        <div class="row">
+                            <!-- Menu Items -->
+                            <div class="col-md-6">
+                                <div class="card mcc border-secondary menuCards mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-3 text-white">Available Menu Items</h6>
+                                        <div id="menuItemsList" class="list-group availableItems">
+                                            <!-- Menu items -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Selected Items -->
+                            <div class="col-md-6">
+                                <div class="card mcc border-secondary menuCards mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-3 text-white">Selected Items</h6>
+                                        <div id="selectedItems" class="list-group selectedItems">
+                                            <!-- Selected items -->
+                                            <div id="noItemsMessage" class="text-center text-muted py-4">
+                                                No items selected
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <h6 class="mb-0 text-white">Total Amount:</h6>
+                                            <span id="totalAmountFood" class="text-primary h5 mb-0">0 Ks</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary bg-dark">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-outline-primary" form="foodOrderForm">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -1223,6 +1304,8 @@
     <script src="js/dashboard.js"></script>
     <script src="js/reservation.js"></script>
     <script src="js/rooms.js"></script>
+    <script src="js/reservationModals.js"></script>
+    <script src="js/roomsModals.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
